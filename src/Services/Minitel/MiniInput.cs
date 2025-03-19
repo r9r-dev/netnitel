@@ -1,4 +1,4 @@
-namespace netnitel.Services.MinitelEngine;
+namespace netnitel.Services.Minitel;
 
 public class MiniInput
 {
