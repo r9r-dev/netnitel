@@ -3,18 +3,8 @@ using System.Text;
 
 namespace netnitel.Services.MinitelEngine;
 
-public class Minitel(WebSocket webSocket)
+public class NetNitel(WebSocket webSocket)
 {
-    // Constantes de couleur
-    public static readonly int Noir = 0;
-    public static readonly int Rouge = 1;
-    public static readonly int Vert = 2;
-    public static readonly int Jaune = 3;
-    public static readonly int Bleu = 4;
-    public static readonly int Magenta = 5;
-    public static readonly int Cyan = 6;
-    public static readonly int Blanc = 7;
-
     /// <summary>
     /// Efface l'écran et la ligne 0
     /// </summary>
@@ -70,9 +60,9 @@ public class Minitel(WebSocket webSocket)
     /// <summary>
     /// Change la couleur de fond
     /// </summary>
-    public async Task BackColor(int couleur)
+    public async Task BackColor(MiniColor couleur)
     {
-        await SendEsc(char.ConvertFromUtf32(80 + couleur));
+        await SendEsc(char.ConvertFromUtf32(80 + (int)couleur));
     }
 
     /// <summary>
@@ -120,9 +110,9 @@ public class Minitel(WebSocket webSocket)
     /// <summary>
     /// Change la couleur d'avant-plan
     /// </summary>
-    public async Task Color(int couleur)
+    public async Task Color(MiniColor couleur)
     {
-        await SendEsc(char.ConvertFromUtf32(64 + couleur));
+        await SendEsc(char.ConvertFromUtf32(64 + (int)couleur));
     }
 
     /// <summary>
@@ -153,14 +143,6 @@ public class Minitel(WebSocket webSocket)
         {
             await SendEsc("I");
         }
-    }
-
-    /// <summary>
-    /// Change la couleur d'arrière-plan
-    /// </summary>
-    public async Task ForeColor(int couleur)
-    {
-        await Color(couleur);
     }
 
     /// <summary>

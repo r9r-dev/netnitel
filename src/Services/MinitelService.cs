@@ -19,7 +19,7 @@ public class MinitelService
     /// <summary>
     /// Service d'annuaire téléphonique
     /// </summary>
-    public async Task Annuaire(Minitel minitel)
+    public async Task Annuaire(NetNitel netNitel)
     {
         // Variables pour stocker les entrées utilisateur
         var quoi = "";
@@ -28,29 +28,29 @@ public class MinitelService
         // Fonction pour afficher la page de recherche
         async Task PageRecherche()
         {
-            await minitel.Home();
-            await minitel.ClearScreen();
+            await netNitel.Home();
+            await netNitel.ClearScreen();
             
             // Titre
-            await minitel.MoveTo(2, 10);
-            await minitel.Color(Minitel.Blanc);
-            await minitel.BackColor(Minitel.Bleu);
-            await minitel.Print(" ANNUAIRE ELECTRONIQUE ");
-            await minitel.Normal();
+            await netNitel.MoveTo(2, 10);
+            await netNitel.Color(MiniColor.Blanc);
+            await netNitel.BackColor(MiniColor.Bleu);
+            await netNitel.Print(" ANNUAIRE ELECTRONIQUE ");
+            await netNitel.Normal();
             
             // Formulaire
-            await minitel.MoveTo(6, 5);
-            await minitel.Print("Qui recherchez-vous ?");
+            await netNitel.MoveTo(6, 5);
+            await netNitel.Print("Qui recherchez-vous ?");
             
-            await minitel.MoveTo(9, 5);
-            await minitel.Print("Dans quelle ville ?");
+            await netNitel.MoveTo(9, 5);
+            await netNitel.Print("Dans quelle ville ?");
             
             // Instructions
-            await minitel.MoveTo(14, 5);
-            await minitel.Print("Appuyez sur ENVOI pour rechercher");
+            await netNitel.MoveTo(14, 5);
+            await netNitel.Print("Appuyez sur ENVOI pour rechercher");
             
-            await minitel.MoveTo(16, 5);
-            await minitel.Print("ou SOMMAIRE pour revenir au menu");
+            await netNitel.MoveTo(16, 5);
+            await netNitel.Print("ou SOMMAIRE pour revenir au menu");
         }
         
         // Boucle principale
@@ -60,8 +60,8 @@ public class MinitelService
             await PageRecherche();
             
             // Saisie des critères de recherche
-            await minitel.MoveTo(7, 5);
-            var reponseQuoi = await minitel.Input(7, 5, 30, quoi);
+            await netNitel.MoveTo(7, 5);
+            var reponseQuoi = await netNitel.Input(7, 5, 30, quoi);
             
             if (reponseQuoi.SpecialKey == MiniKey.Sommaire)
             {
@@ -69,8 +69,8 @@ public class MinitelService
                 continue;
             }
             
-            await minitel.MoveTo(10, 5);
-            var reponseOu = await minitel.Input(10, 5, 30, ou);
+            await netNitel.MoveTo(10, 5);
+            var reponseOu = await netNitel.Input(10, 5, 30, ou);
             
             if (reponseOu.SpecialKey == MiniKey.Sommaire)
             {
@@ -82,17 +82,17 @@ public class MinitelService
                 if (!string.IsNullOrWhiteSpace(quoi) && !string.IsNullOrWhiteSpace(ou))
                 {
                     // Afficher message de recherche
-                    await minitel.Message(0, 1, 2, "Recherche en cours...", true);
+                    await netNitel.Message(0, 1, 2, "Recherche en cours...", true);
                     
                     // Effectuer la recherche (simulation)
                     var resultats = await RechercheAnnuaire(quoi, ou);
                     
                     // Afficher les résultats
-                    await AfficherResultats(minitel, quoi, ou, resultats);
+                    await AfficherResultats(netNitel, quoi, ou, resultats);
                 }
                 else
                 {
-                    await minitel.Message(0, 1, 3, "Veuillez remplir tous les champs", true);
+                    await netNitel.Message(0, 1, 3, "Veuillez remplir tous les champs", true);
                 }
             }
         }
@@ -146,7 +146,7 @@ public class MinitelService
     /// <summary>
     /// Affiche les résultats de la recherche d'annuaire
     /// </summary>
-    private async Task AfficherResultats(Minitel minitel, string quoi, string ou, List<ResultatAnnuaire> resultats)
+    private async Task AfficherResultats(NetNitel netNitel, string quoi, string ou, List<ResultatAnnuaire> resultats)
     {
         var page = 0;
         var resultsPerPage = 1;
@@ -154,23 +154,23 @@ public class MinitelService
         
         while (viewing)
         {
-            await minitel.Home();
-            await minitel.ClearScreen();
+            await netNitel.Home();
+            await netNitel.ClearScreen();
             
             // Titre
-            await minitel.MoveTo(2, 10);
-            await minitel.Color(Minitel.Blanc);
-            await minitel.BackColor(Minitel.Bleu);
-            await minitel.Print(" RESULTATS DE RECHERCHE ");
-            await minitel.Normal();
+            await netNitel.MoveTo(2, 10);
+            await netNitel.Color(MiniColor.Blanc);
+            await netNitel.BackColor(MiniColor.Bleu);
+            await netNitel.Print(" RESULTATS DE RECHERCHE ");
+            await netNitel.Normal();
             
             // Critères
-            await minitel.MoveTo(4, 5);
-            await minitel.Print($"Recherche : {quoi} à {ou}");
+            await netNitel.MoveTo(4, 5);
+            await netNitel.Print($"Recherche : {quoi} à {ou}");
             
             // Nombre total
-            await minitel.MoveTo(5, 5);
-            await minitel.Print($"Trouvé : {resultats.Count} résultat(s)");
+            await netNitel.MoveTo(5, 5);
+            await netNitel.Print($"Trouvé : {resultats.Count} résultat(s)");
             
             if (resultats.Count > 0)
             {
@@ -183,48 +183,48 @@ public class MinitelService
                     var baseRow = 7 + (i - startIdx) * 5;
                     
                     // Afficher un résultat
-                    await minitel.MoveTo(baseRow, 5);
-                    await minitel.Color(Minitel.Jaune);
-                    await minitel.Print(result.Nom);
-                    await minitel.Color(Minitel.Blanc);
+                    await netNitel.MoveTo(baseRow, 5);
+                    await netNitel.Color(MiniColor.Jaune);
+                    await netNitel.Print(result.Nom);
+                    await netNitel.Color(MiniColor.Blanc);
                     
-                    await minitel.MoveTo(baseRow + 1, 5);
-                    await minitel.Print(result.Adresse);
+                    await netNitel.MoveTo(baseRow + 1, 5);
+                    await netNitel.Print(result.Adresse);
                     
-                    await minitel.MoveTo(baseRow + 2, 5);
-                    await minitel.Print($"{result.CodePostal} {result.Ville}");
+                    await netNitel.MoveTo(baseRow + 2, 5);
+                    await netNitel.Print($"{result.CodePostal} {result.Ville}");
                     
-                    await minitel.MoveTo(baseRow + 3, 5);
-                    await minitel.Color(Minitel.Vert);
-                    await minitel.Print($"Tél: {result.Telephone}");
-                    await minitel.Color(Minitel.Blanc);
+                    await netNitel.MoveTo(baseRow + 3, 5);
+                    await netNitel.Color(MiniColor.Vert);
+                    await netNitel.Print($"Tél: {result.Telephone}");
+                    await netNitel.Color(MiniColor.Blanc);
                 }
                 
                 // Navigation
-                await minitel.MoveTo(18, 5);
+                await netNitel.MoveTo(18, 5);
                 
                 if (page > 0)
                 {
-                    await minitel.Print("RETOUR: résultat précédent  ");
+                    await netNitel.Print("RETOUR: résultat précédent  ");
                 }
                 
                 if (page < (resultats.Count - 1) / resultsPerPage)
                 {
-                    await minitel.Print("SUITE: résultat suivant");
+                    await netNitel.Print("SUITE: résultat suivant");
                 }
             }
             else
             {
-                await minitel.MoveTo(10, 5);
-                await minitel.Print("Aucun résultat trouvé !");
+                await netNitel.MoveTo(10, 5);
+                await netNitel.Print("Aucun résultat trouvé !");
             }
             
             // Instructions
-            await minitel.MoveTo(20, 5);
-            await minitel.Print("SOMMAIRE: retour à la recherche");
+            await netNitel.MoveTo(20, 5);
+            await netNitel.Print("SOMMAIRE: retour à la recherche");
             
             // Attendre l'entrée utilisateur
-            var input = await minitel.Input(22, 5, 1, "", " ", false);
+            var input = await netNitel.Input(22, 5, 1, "", " ", false);
             
             if (input.SpecialKey == MiniKey.Sommaire)
             {
@@ -244,7 +244,7 @@ public class MinitelService
     /// <summary>
     /// Jeu de snake
     /// </summary>
-    public async Task Snake(Minitel minitel)
+    public async Task Snake(NetNitel netNitel)
     {
         // Constantes du jeu
         const int GameWidth = 20;
@@ -326,47 +326,47 @@ public class MinitelService
         // Dessiner le plateau de jeu initial (une seule fois)
         async Task DrawInitialBoard()
         {
-            await minitel.Home();
-            await minitel.ClearScreen();
+            await netNitel.Home();
+            await netNitel.ClearScreen();
             
             // Plateau commence à la position (3,3)
             
             // Titre
-            await minitel.MoveTo(1, 10);
-            await minitel.Color(Minitel.Vert);
-            await minitel.Print("SNAKE MINITEL");
-            await minitel.Color(Minitel.Blanc);
+            await netNitel.MoveTo(1, 10);
+            await netNitel.Color(MiniColor.Vert);
+            await netNitel.Print("SNAKE MINITEL");
+            await netNitel.Color(MiniColor.Blanc);
             
             // Dessiner les murs
-            await minitel.Color(Minitel.Magenta);
+            await netNitel.Color(MiniColor.Magenta);
             
             // Mur horizontal supérieur
-            await minitel.MoveTo(2, 3);
-            await minitel.Print(new string(Wall[0], GameWidth + 2));
+            await netNitel.MoveTo(2, 3);
+            await netNitel.Print(new string(Wall[0], GameWidth + 2));
             
             // Murs latéraux et inférieur
             for (var y = 1; y <= GameHeight; y++)
             {
-                await minitel.MoveTo(2 + y, 3);
-                await minitel.Print(Wall);
+                await netNitel.MoveTo(2 + y, 3);
+                await netNitel.Print(Wall);
                 
-                await minitel.MoveTo(2 + y, 3 + GameWidth + 1);
-                await minitel.Print(Wall);
+                await netNitel.MoveTo(2 + y, 3 + GameWidth + 1);
+                await netNitel.Print(Wall);
             }
             
             // Mur horizontal inférieur
-            await minitel.MoveTo(2 + GameHeight + 1, 3);
-            await minitel.Print(new string(Wall[0], GameWidth + 2));
+            await netNitel.MoveTo(2 + GameHeight + 1, 3);
+            await netNitel.Print(new string(Wall[0], GameWidth + 2));
             
-            await minitel.Color(Minitel.Blanc);
+            await netNitel.Color(MiniColor.Blanc);
             
             // Instructions
-            await minitel.MoveTo(2 + GameHeight + 3, 3);
-            await minitel.Print("Utilisez:");
-            await minitel.MoveTo(2 + GameHeight + 4, 3);
-            await minitel.Print("8:Haut 2:Bas 4:Gauche 6:Droite");
-            await minitel.MoveTo(2 + GameHeight + 5, 3);
-            await minitel.Print("ENVOI: Quitter");
+            await netNitel.MoveTo(2 + GameHeight + 3, 3);
+            await netNitel.Print("Utilisez:");
+            await netNitel.MoveTo(2 + GameHeight + 4, 3);
+            await netNitel.Print("8:Haut 2:Bas 4:Gauche 6:Droite");
+            await netNitel.MoveTo(2 + GameHeight + 5, 3);
+            await netNitel.Print("ENVOI: Quitter");
         }
         
         // Mettre à jour le score
@@ -375,10 +375,10 @@ public class MinitelService
             // Si le score a changé, le mettre à jour
             if (score != lastScore)
             {
-                await minitel.MoveTo(1, 25);
-                await minitel.Color(Minitel.Jaune);
-                await minitel.Print($"Score: {score}");
-                await minitel.Color(Minitel.Blanc);
+                await netNitel.MoveTo(1, 25);
+                await netNitel.Color(MiniColor.Jaune);
+                await netNitel.Print($"Score: {score}");
+                await netNitel.Color(MiniColor.Blanc);
                 lastScore = score;
             }
         }
@@ -386,38 +386,38 @@ public class MinitelService
         // Dessiner la nourriture
         async Task DrawFood()
         {
-            await minitel.MoveTo(2 + food.y, 3 + food.x + 1);
-            await minitel.Color(Minitel.Jaune);
-            await minitel.Print(Food);
-            await minitel.Color(Minitel.Blanc);
+            await netNitel.MoveTo(2 + food.y, 3 + food.x + 1);
+            await netNitel.Color(MiniColor.Jaune);
+            await netNitel.Print(Food);
+            await netNitel.Color(MiniColor.Blanc);
         }
         
         // Mettre à jour l'affichage du serpent
         async Task UpdateSnake()
         {
             // Dessiner la tête du serpent
-            await minitel.MoveTo(2 + snake[0].y, 3 + snake[0].x + 1);
-            await minitel.Color(Minitel.Vert);
-            await minitel.Print(SnakeHead);
+            await netNitel.MoveTo(2 + snake[0].y, 3 + snake[0].x + 1);
+            await netNitel.Color(MiniColor.Vert);
+            await netNitel.Print(SnakeHead);
             
             // Si nous avons un second segment, l'ancien segment de tête devient un segment de corps
             if (snake.Count > 1)
             {
-                await minitel.MoveTo(2 + snake[1].y, 3 + snake[1].x + 1);
-                await minitel.Print(SnakeBody);
+                await netNitel.MoveTo(2 + snake[1].y, 3 + snake[1].x + 1);
+                await netNitel.Print(SnakeBody);
             }
             
             // Effacer l'ancienne queue uniquement si aucune nourriture n'a été mangée
             if (lastTail.HasValue && !foodEaten)
             {
-                await minitel.MoveTo(2 + lastTail.Value.y, 3 + lastTail.Value.x + 1);
-                await minitel.Print(Empty);
+                await netNitel.MoveTo(2 + lastTail.Value.y, 3 + lastTail.Value.x + 1);
+                await netNitel.Print(Empty);
             }
             
             // Réinitialiser le drapeau de nourriture mangée
             foodEaten = false;
             
-            await minitel.Color(Minitel.Blanc);
+            await netNitel.Color(MiniColor.Blanc);
         }
         
         // Déplacer le serpent
@@ -498,22 +498,22 @@ public class MinitelService
         // Afficher l'écran de fin de jeu
         async Task GameOver()
         {
-            await minitel.MoveTo(10, 8);
-            await minitel.Color(Minitel.Rouge);
-            await minitel.Print("GAME OVER");
+            await netNitel.MoveTo(10, 8);
+            await netNitel.Color(MiniColor.Rouge);
+            await netNitel.Print("GAME OVER");
             
-            await minitel.MoveTo(12, 8);
-            await minitel.Color(Minitel.Jaune);
-            await minitel.Print($"Score final: {score}");
+            await netNitel.MoveTo(12, 8);
+            await netNitel.Color(MiniColor.Jaune);
+            await netNitel.Print($"Score final: {score}");
             
-            await minitel.MoveTo(14, 8);
-            await minitel.Color(Minitel.Blanc);
-            await minitel.Print("Appuyez sur ENVOI");
+            await netNitel.MoveTo(14, 8);
+            await netNitel.Color(MiniColor.Blanc);
+            await netNitel.Print("Appuyez sur ENVOI");
             
             // Attendre que l'utilisateur appuie sur ENVOI
             while (true)
             {
-                var isEnvoi = await minitel.Input(0, 0, 1, "", " ", false);
+                var isEnvoi = await netNitel.Input(0, 0, 1, "", " ", false);
                 if (isEnvoi.SpecialKey == MiniKey.Envoi || isEnvoi.SpecialKey == MiniKey.Sommaire)
                 {
                     break;
@@ -573,7 +573,7 @@ public class MinitelService
                     while (running)
                     {
                         // Utilisation de la méthode Input de Pynitel pour gérer les entrées
-                        var input = await minitel.Input(0, 0, 1, "", " ", false);
+                        var input = await netNitel.Input(0, 0, 1, "", " ", false);
                         var ch = ' ';
                         
                         // Simuler une entrée clavier pour les directions

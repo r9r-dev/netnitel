@@ -31,7 +31,7 @@ public class IndexController : ControllerBase
 
     private async Task HandleIndexWebSocket(WebSocket webSocket)
     {
-        var pynitel = new Minitel(webSocket);
+        var pynitel = new NetNitel(webSocket);
 
         // Afficher la page d'accueil
         await DisplayWelcome();
@@ -80,8 +80,8 @@ public class IndexController : ControllerBase
 
             // Afficher le titre
             await pynitel.MoveTo(2, 15);
-            await pynitel.Color(Minitel.Blanc);
-            await pynitel.BackColor(Minitel.Bleu);
+            await pynitel.Color(MiniColor.Blanc);
+            await pynitel.BackColor(MiniColor.Bleu);
             await pynitel.Print(" 3615 SYMPA ");
             await pynitel.Normal();
 
