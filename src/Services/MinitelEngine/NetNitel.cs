@@ -12,7 +12,7 @@ public class NetNitel(WebSocket webSocket)
     {
         await Del(0, 1);
         await SendChr(12); // FF
-        await Cursor(false); // Coff
+        await HideCursor(); // Coff
     }
 
     /// <summary>
@@ -114,11 +114,21 @@ public class NetNitel(WebSocket webSocket)
     {
         await SendEsc(char.ConvertFromUtf32(64 + (int)couleur));
     }
+    
+    public async Task ShowCursor()
+    {
+        await Cursor(true);
+    }
+    
+    public async Task HideCursor()
+    {
+        await Cursor(false);
+    }
 
     /// <summary>
     /// Active/désactive le curseur
     /// </summary>
-    public async Task Cursor(bool visible)
+    private async Task Cursor(bool visible)
     {
         if (visible)
         {
@@ -146,8 +156,17 @@ public class NetNitel(WebSocket webSocket)
     }
 
     /// <summary>
-    /// Attend une entrée clavier
+    /// Attend une entrée clavier et retourne les informations
     /// </summary>
+    /// <param name="ligne">Ligne ou positionner le curseur</param>
+    /// <param name="colonne">Colonne ou positionner le curseur</param>
+    /// <param name="longueur">Longueur du message</param>
+    /// <param name="data">Prompt à afficher</param>
+    /// <param name="caractere">Caractères de la ligne</param>
+    /// <param name="redraw">Effacer la zone avant d'afficher le prompt</param>
+    /// <returns></returns>
+    /// <exception cref="WebSocketException"></exception>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
     public async Task<MiniInput> Input(
         int ligne,
         int colonne,
@@ -176,7 +195,7 @@ public class NetNitel(WebSocket webSocket)
             await MoveTo(ligne, colonne + data.Length);
         }
 
-        await Cursor(true);
+        await ShowCursor();
 
         var input = new StringBuilder(data);
         var finished = false;
@@ -222,7 +241,7 @@ public class NetNitel(WebSocket webSocket)
             }
         }
 
-        await Cursor(false);
+        await HideCursor();
         
         return new MiniInput { Message = input.ToString(), SpecialKey = key};
     }
