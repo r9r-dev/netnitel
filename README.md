@@ -1,2 +1,2 @@
-# netnitel
-.net library to write Minitel servers/software
+# Pynitel - Version .NET Core
+
