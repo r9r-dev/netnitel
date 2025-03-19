@@ -1,12 +1,20 @@
 using System.Net.WebSockets;
+using netnitel.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddHttpClient();
+builder.Services.AddSingleton<MinitelService>();
 
 var app = builder.Build();
 
-app.UseWebSockets();
+// Configure WebSockets
+var webSocketOptions = new WebSocketOptions
+{
+    KeepAliveInterval = TimeSpan.FromMinutes(2)
+};
+app.UseWebSockets(webSocketOptions);
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
