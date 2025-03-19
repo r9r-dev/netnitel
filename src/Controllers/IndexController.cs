@@ -30,6 +30,11 @@ public class IndexController : ControllerBase
         await m.Home();
         await m.ClearScreen();
 
+        // await m.GraphicMode();
+        // await m.MoveTo(5, 5);
+        // await m.Print("010101");
+        // await m.TextMode();
+        
         // Afficher un cadre de 40x23
         await m.MoveTo(1, 1);
         await m.Color(MiniColor.Blanc);
@@ -59,7 +64,7 @@ public class IndexController : ControllerBase
 
         await m.MoveTo(0, 1);
         await m.Print("CX 0,05E puis 0,39E/min");
-        
+        //await m.Inverse(false);
         
         
         

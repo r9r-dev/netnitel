@@ -147,11 +147,11 @@ public class NetNitel(WebSocket webSocket)
     {
         if (clignote)
         {
-            await SendEsc("H");
+            await SendEsc("\x48");
         }
         else
         {
-            await SendEsc("I");
+            await SendEsc("\x49");
         }
     }
 
@@ -253,12 +253,22 @@ public class NetNitel(WebSocket webSocket)
     {
         if (inverse)
         {
-            await SendEsc("X");
+            await SendEsc("\x5D");
         }
         else
         {
-            await SendEsc("Y");
+            await SendEsc("\\");
         }
+    }
+
+    public async Task TextMode()
+    {
+        await SendChr(15);
+    }
+    
+    public async Task GraphicMode()
+    {
+        await SendChr(14);
     }
 
     /// <summary>
