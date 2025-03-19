@@ -17,7 +17,7 @@ Dans sa version initiale, j'ai implémenté le portage de l'annuaire et du jeu S
 - .NET 9 SDK
 - Un minitel avec dongle ESP32 (comme celui de [iodeo](https://www.tindie.com/stores/iodeo/) que j'utilise).
 
-Vous pouvez également utilisé un émulateur Minitel comme celui de [MiniPavi](https://www.minipavi.fr/emulminitel).
+Vous pouvez également utiliser un émulateur Minitel comme celui de [MiniPavi](https://www.minipavi.fr/emulminitel).
 
 ## Installation
 

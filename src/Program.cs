@@ -16,9 +16,6 @@ var webSocketOptions = new WebSocketOptions
 };
 app.UseWebSockets(webSocketOptions);
 
-app.UseDefaultFiles();
-app.UseStaticFiles();
-
 app.MapControllers();
 
 app.Run();
