@@ -3,14 +3,8 @@ using System.Text;
 
 namespace netnitel.Services.MinitelEngine;
 
-public class Minitel
+public class Minitel(WebSocket webSocket)
 {
-    private readonly WebSocket _webSocket;
-    private string _lastScreen = "";
-    private bool _lastStar = false;
-    private List<(int ligne, int colonne, int longueur, string texte, int couleur)> _zones = new();
-    private int _zoneNumber = 0;
-
     // Constantes de couleur
     public static readonly int Noir = 0;
     public static readonly int Rouge = 1;
@@ -20,16 +14,6 @@ public class Minitel
     public static readonly int Magenta = 5;
     public static readonly int Cyan = 6;
     public static readonly int Blanc = 7;
-
-    // Constantes de séquence de protocole
-    private static readonly string PRO1 = "\u001b9";
-    private static readonly string PRO2 = "\u001b:";
-    private static readonly string PRO3 = "\u001b;";
-    
-    public Minitel(WebSocket webSocket)
-    {
-        _webSocket = webSocket;
-    }
 
     /// <summary>
     /// Efface l'écran et la ligne 0
@@ -46,7 +30,7 @@ public class Minitel
     /// </summary>
     public async Task VTab(int ligne)
     {
-        await MoveTo(ligne, 1);
+        await MoveTo(ligne);
     }
 
     /// <summary>
@@ -219,7 +203,7 @@ public class Minitel
         while (!finished)
         {
             var buffer = new byte[1024];
-            var result = await _webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+            var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
             
             if (result.CloseStatus.HasValue)
             {
@@ -337,7 +321,7 @@ public class Minitel
     private async Task Send(string text)
     {
         var buffer = Encoding.UTF8.GetBytes(text);
-        await _webSocket.SendAsync(
+        await webSocket.SendAsync(
             new ArraySegment<byte>(buffer),
             WebSocketMessageType.Text,
             true,
