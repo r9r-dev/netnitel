@@ -30,40 +30,12 @@ public class IndexController : ControllerBase
         {
             await nitel.Control.Home();
             await nitel.Control.ClearScreen();
-            
-            await nitel.Control.Move(1, 1);
-            await nitel.Control.WriteGraphic("111010");
-            await nitel.Control.Move(24, 1);
-            await nitel.Control.WriteGraphic("101011");
-            await nitel.Control.Move(1, 40);
-            await nitel.Control.WriteGraphic("110101");
-            await nitel.Control.Move(24, 40);
-            await nitel.Control.WriteGraphic("010111");
 
-            // Afficher un cadre de 40x23
-            await nitel.Control.Move(1, 2);
-            await nitel.Control.WriteGraphic("110000");
-            await nitel.Control.Repeat(37);
-
-            await nitel.Control.Move(24, 2);
-            await nitel.Control.WriteGraphic("000011");
-            await nitel.Control.Repeat(37);
-
-            for (var i = 1; i < 23; i++)
-            {
-                await nitel.Control.Move(i + 1, 1);
-                await nitel.Control.WriteGraphic("101010");
-            }
-
-            for (var i = 1; i < 23; i++)
-            {
-                await nitel.Control.Move(i + 1, 40);
-                await nitel.Control.WriteGraphic("010101");
-            }
+            await nitel.DrawImage("image.png");
             
             while (webSocket.State == WebSocketState.Open)
             {
-                var input = await nitel.Input(23, 3, 36, "Youpi : ");
+                var input = await nitel.Input(0, 1, 1, "", "", false);
             }
 
         }

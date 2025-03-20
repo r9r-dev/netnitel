@@ -10,7 +10,7 @@ public class ImageService
     private const int IMAGE_WIDTH = 80;
     private const int IMAGE_HEIGHT = 72;
 
-    private static readonly Color[] Palette = new[]
+    public static readonly Color[] Palette = new[]
     {
         Color.Black,    // Noir
         Color.Red,      // Rouge

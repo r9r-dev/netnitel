@@ -84,7 +84,7 @@ public class MiniControle
     public async Task WriteGraphic(string character)
     {
         if (character.Length != 6) throw new ArgumentException("Le caractère doit être de 6 bits");
-        if (!_graphicMode) await GraphicMode();
+        await GraphicMode();
         // le texte est au format 123456 en binaire
         // Par exemple 010101
         // il faut inverser le sens du texte et le convertir en binaire
