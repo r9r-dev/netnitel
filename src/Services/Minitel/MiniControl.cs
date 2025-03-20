@@ -67,6 +67,38 @@ public class MiniControl
     }
 
     /// <summary>
+    /// Passe le texte en taille double
+    /// </summary>
+    public async Task DoubleSizeText()
+    {
+        await _miniRaw.SendEsc(0x4F);
+    }
+    
+    /// <summary>
+    /// Passe le texte en taille normale
+    /// </summary>
+    public async Task NormalSizeText()
+    {
+        await _miniRaw.SendEsc(0x4C);
+    }
+    
+    /// <summary>
+    /// Passe le texte en taille double en hauteur
+    /// </summary>
+    public async Task DoubleHeightText()
+    {
+        await _miniRaw.SendEsc(0x4D);
+    }
+
+    /// <summary>
+    /// Passe le texte en taille double en largeur
+    /// </summary>
+    public async Task DoubleWidthText()
+    {
+        await _miniRaw.SendEsc(0x4E);
+    }
+
+    /// <summary>
     /// 
     /// </summary>
     private async Task GraphicMode()

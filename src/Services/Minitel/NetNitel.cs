@@ -38,6 +38,13 @@ public class NetNitel
         await Control.Move(ligne, colonne);
         await Control.Cancel();
     }
+    
+    public async Task Move(int ligne, int colonne)
+    {
+        if (ligne > 24) ligne = 24;
+        if (colonne > 40) colonne = 40;
+        await Control.Move(ligne, colonne);
+    }
 
     /// <summary>
     /// Attend une entrée clavier et retourne les informations
@@ -306,22 +313,32 @@ public class NetNitel
         {
             switch (c)
             {
-                case 'é': sb.Append("\u001BHe"); break;
-                case 'è': sb.Append("\u001BIe"); break;
-                case 'ê': sb.Append("\u001BJe"); break;
-                case 'à': sb.Append("\u001BAa"); break;
-                case 'â': sb.Append("\u001BBa"); break;
-                case 'ç': sb.Append("\u001BKc"); break;
-                case 'ù': sb.Append("\u001BUu"); break;
-                case 'û': sb.Append("\u001BVu"); break;
-                case 'ô': sb.Append("\u001BOu"); break;
-                case 'î': sb.Append("\u001BLi"); break;
-                case 'ï': sb.Append("\u001BMi"); break;
-                case 'ë': sb.Append("\u001BNe"); break;
-                case 'ü': sb.Append("\u001BWu"); break;
+                case 'é': sb.Append("\eHe"); break;
+                case 'è': sb.Append("\eIe"); break;
+                case 'ê': sb.Append("\eJe"); break;
+                case 'à': sb.Append("\eAa"); break;
+                case 'â': sb.Append("\eBa"); break;
+                case 'ç': sb.Append("\eKc"); break;
+                case 'ù': sb.Append("\eUu"); break;
+                case 'û': sb.Append("\eVu"); break;
+                case 'ô': sb.Append("\eOu"); break;
+                case 'î': sb.Append("\eLi"); break;
+                case 'ï': sb.Append("\eMi"); break;
+                case 'ë': sb.Append("\eNe"); break;
+                case 'ü': sb.Append("\eWu"); break;
                 default: sb.Append(c); break;
             }
         }
         return sb.ToString();
+    }
+
+    public async Task BackColor(MiniColor color)
+    {
+        await Control.BackColor(color);
+    }
+
+    public async Task ForeColor(MiniColor color)
+    {
+        await Control.ForeColor(color);
     }
 } 

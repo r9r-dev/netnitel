@@ -12,14 +12,14 @@ public class ImageService
 
     public static readonly Color[] Palette = new[]
     {
-        Color.Black,    // Noir
-        Color.Red,      // Rouge
-        Color.Green,    // Vert
-        Color.Yellow,   // Jaune
-        Color.Blue,     // Bleu
-        Color.Magenta,  // Magenta
-        Color.Cyan,     // Cyan
-        Color.White     // Blanc
+        Color.FromArgb(0, 0, 0),    // Noir
+        Color.FromArgb(255, 0, 0),      // Rouge
+        Color.FromArgb(0, 255, 0),    // Vert
+        Color.FromArgb(255, 255, 0),   // Jaune
+        Color.FromArgb(0, 0, 255),     // Bleu
+        Color.FromArgb(255, 0, 255),  // Magenta
+        Color.FromArgb(0, 255, 255),     // Cyan
+        Color.FromArgb(255, 255, 255)  // Blanc
     };
 
     public byte[] ResizeImageToMaxDimensions(byte[] imageData)
