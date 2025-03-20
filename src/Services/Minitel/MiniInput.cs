@@ -76,6 +76,7 @@ public class MiniInput
         }
 
         var ch = input[0];
+        var intch = (int)ch;
 
         switch ((int)ch)
         {
@@ -96,7 +97,13 @@ public class MiniInput
                 return new MiniInput(MiniKey.Delete);
         }
         
-        ConsoleParsed($"Char {input}");
+        if (intch is >= 32 and <= 126)
+        {
+            ConsoleParsed($"Char {ch}");
+            return new MiniInput(ch.ToString());
+        }
+        
+        ConsoleParsed($"Unknown {input}");
         
         return new MiniInput { Message = input };
     }
