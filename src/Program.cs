@@ -1,5 +1,6 @@
 using System.Net.WebSockets;
 using netnitel.Services;
+using netnitel.Services.Images;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,9 @@ var webSocketOptions = new WebSocketOptions
 app.UseWebSockets(webSocketOptions);
 
 app.MapControllers();
+
+var imageService = new ImageService();
+imageService.ProcessImageFile("image.png", "output.png");
 
 app.Run();
 

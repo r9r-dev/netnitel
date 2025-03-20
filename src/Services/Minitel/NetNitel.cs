@@ -147,7 +147,11 @@ public class NetNitel
         await Print(spaces);
     }
 
-
+    public async Task DrawImage(string imagePath)
+    {
+        await Control.Home();
+    }
+    
     /// <summary>
     /// Affiche du texte
     /// </summary>
