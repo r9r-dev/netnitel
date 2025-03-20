@@ -6,12 +6,12 @@ namespace netnitel.Services.Minitel;
 /// Contrôle le minitel
 /// Documentation : https://millevaches.hydraule.org/info/minitel/specs/norme.htm
 /// </summary>
-public class MiniControle
+public class MiniControl
 {
     private readonly MiniRaw _miniRaw;
     private bool _graphicMode = false;
 
-    public MiniControle(WebSocket webSocket)
+    public MiniControl(WebSocket webSocket)
     {
         _miniRaw = new MiniRaw(webSocket);
     }

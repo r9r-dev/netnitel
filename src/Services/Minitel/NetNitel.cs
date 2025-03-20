@@ -8,14 +8,14 @@ namespace netnitel.Services.Minitel;
 
 public class NetNitel
 {
-    public MiniControle Control { get; }
+    public MiniControl Control { get; }
     private readonly WebSocket _webSocket;
     private readonly ImageService _imageService;
     
     public NetNitel(WebSocket webSocket)
     {
         _webSocket = webSocket;
-        Control = new MiniControle(webSocket);
+        Control = new MiniControl(webSocket);
         _imageService = new ImageService();
     }
     
@@ -152,6 +152,10 @@ public class NetNitel
         await Print(spaces);
     }
 
+    /// <summary>
+    /// Remplit l'écran avec une image en 80x72.
+    /// </summary>
+    /// <param name="imagePath"></param>
     public async Task DrawImage(string imagePath)
     {
         // Placer le curseur en haut à gauche
