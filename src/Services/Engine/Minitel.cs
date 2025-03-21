@@ -161,6 +161,58 @@ public class Minitel
         await Print(spaces);
     }
 
+    public async Task DrawText(string text, int ligne = 1, int colonne = 1, MiniColor foreColor = MiniColor.Noir, MiniColor backColor = MiniColor.Blanc)
+    {
+        var letters = new ImageTextWriter().GetImageLetters(text);
+        var image = await _imageService.CombineImages(letters);
+        
+        using var rgba32Image = Image.Load<Rgba32>(image);
+        
+        // Déterminer les dimensions de l'image en blocs
+        var blocksWidth = rgba32Image.Width / 2;
+        var blocksHeight = rgba32Image.Height / 3;
+        
+        // Pour chaque ligne de blocs
+        for (var blockY = 0; blockY < blocksHeight; blockY++)
+        {
+            // Déplacer le curseur au début de la ligne
+            await Control.Move(ligne + blockY, colonne);
+            
+            // Pour chaque bloc dans la ligne
+            for (var blockX = 0; blockX < blocksWidth; blockX++)
+            {
+                // Calculer la position du bloc dans l'image
+                var pixelX = blockX * 2;
+                var pixelY = blockY * 3;
+                
+                
+                await Control.ForeColor(foreColor);
+                await Control.BackColor(backColor);
+                
+                var color1 = new Rgba32(0, 0, 0);
+                var color2 = new Rgba32(255, 255, 255);
+                
+                // Lire les 6 pixels du bloc
+                var pixels = new bool[6];
+                for (var y = 0; y < 3; y++)
+                {
+                    for (var x = 0; x < 2; x++)
+                    {
+                        var color = rgba32Image[pixelX + x, pixelY + y];
+                        // Si la couleur est plus proche de la première couleur dominante, c'est un pixel positif
+                        pixels[y * 2 + x] = IsPositivePixel(color, color1, color2);
+                    }
+                }
+                
+                // Convertir les pixels en chaîne de 0 et 1
+                var pixelString = string.Join("", pixels.Select(p => p ? "1" : "0"));
+                
+                // Écrire le bloc (le curseur avance automatiquement)
+                await Control.WriteGraphic(pixelString);
+            }
+        }
+    }
+
     /// <summary>
     /// Remplit l'écran avec une image en 80x72.
     /// </summary>
