@@ -4,6 +4,8 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>default</LangVersion>
+    <Company>Ronan Lamour</Company>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,20 +1,21 @@
 using System.Net.WebSockets;
 using System.Text;
+using NetNitel.Services.Images;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
-using netnitel.Services.Images;
 
-namespace netnitel.Services.Minitel;
+namespace NetNitel.Services.Engine;
 
-public class NetNitel
+public class Minitel
 {
     public MiniControl Control { get; }
     private readonly WebSocket _webSocket;
     private readonly ImageService _imageService;
+    private Guid _connectionId;
     
-    public NetNitel(WebSocket webSocket)
+    public Minitel(WebSocket webSocket, Guid connectionId)
     {
+        _connectionId = connectionId;
         _webSocket = webSocket;
         Control = new MiniControl(webSocket);
         _imageService = new ImageService();
@@ -170,10 +171,11 @@ public class NetNitel
         await Control.Home();
 
         // Traiter l'image pour obtenir une version 80x72 en 8 couleurs
-        _imageService.ProcessImageFile(imagePath, "temp.png");
+        var image = await File.ReadAllBytesAsync(imagePath);
+        var miniImage = await _imageService.ConvertTo8Colors(image);
         
         // Charger l'image traitée
-        using var image = Image.Load<Rgba32>("temp.png");
+        using var rgba32Image = Image.Load<Rgba32>(miniImage);
         
         // Pour chaque ligne de 24 blocs
         for (var line = 0; line < 24; line++)
@@ -186,7 +188,7 @@ public class NetNitel
                 var blockY = line * 3;
 
                 // Définir les couleurs pour ce bloc
-                var (color1, color2) = GetBlockColors(image, blockX, blockY);
+                var (color1, color2) = GetBlockColors(rgba32Image, blockX, blockY);
                 await Control.ForeColor(ConvertToMiniColor(color1));
                 await Control.BackColor(ConvertToMiniColor(color2));
 
@@ -196,7 +198,7 @@ public class NetNitel
                 {
                     for (var x = 0; x < 2; x++)
                     {
-                        var color = image[blockX + x, blockY + y];
+                        var color = rgba32Image[blockX + x, blockY + y];
                         // Si la couleur est plus proche de la première couleur dominante, c'est un pixel positif
                         pixels[y * 2 + x] = IsPositivePixel(color, color1, color2);
                     }

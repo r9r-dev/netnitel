@@ -1,4 +1,4 @@
-namespace netnitel.Services.Minitel;
+namespace NetNitel.Services.Engine;
 
 public enum MiniColor
 {

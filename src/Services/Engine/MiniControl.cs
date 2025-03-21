@@ -1,6 +1,6 @@
 using System.Net.WebSockets;
 
-namespace netnitel.Services.Minitel;
+namespace NetNitel.Services.Engine;
 
 /// <summary>
 /// Contrôle le minitel
@@ -71,6 +71,7 @@ public class MiniControl
     /// </summary>
     public async Task DoubleSizeText()
     {
+        _graphicMode = false;
         await _miniRaw.SendEsc(0x4F);
     }
     
@@ -98,25 +99,10 @@ public class MiniControl
         await _miniRaw.SendEsc(0x4E);
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    private async Task GraphicMode()
-    {
-        _graphicMode = true;
-        await _miniRaw.SendChr(0x0E);
-    }
-
-    private async Task TextMode()
-    {
-        _graphicMode = false;
-        await _miniRaw.SendChr(0x0F);
-    }
-
     public async Task WriteGraphic(string character)
     {
         if (character.Length != 6) throw new ArgumentException("Le caractère doit être de 6 bits");
-        await GraphicMode();
+        if (!_graphicMode) await GraphicMode();
         // le texte est au format 123456 en binaire
         // Par exemple 010101
         // il faut inverser le sens du texte et le convertir en binaire
@@ -138,6 +124,7 @@ public class MiniControl
     /// <param name="color"></param>
     public async Task BackColor(MiniColor color)
     {
+        _graphicMode = false;
         await _miniRaw.SendEsc(0x50 + (int)color);
     }
 
@@ -147,6 +134,7 @@ public class MiniControl
     /// <param name="color"></param>
     public async Task ForeColor(MiniColor color)
     {
+        _graphicMode = false;
         await _miniRaw.SendEsc(0x40 + (int)color);
     }
 
@@ -159,19 +147,21 @@ public class MiniControl
     }
 
     /// <summary>
-    /// Passage dans le jeu semi-graphique (G1)
+    /// Passage dans le jeu normal (G0)
     /// </summary>
-    public async Task SemiGraphicalMode()
+    private async Task TextMode()
     {
-        await _miniRaw.SendChr(0x0E);
+        _graphicMode = false;
+        await _miniRaw.SendChr(0x0F);
     }
 
     /// <summary>
-    /// Passage dans le jeu normal (G0)
+    /// Passage dans le jeu graphique (G1)
     /// </summary>
-    public async Task NormalMode()
+    private async Task GraphicMode()
     {
-        await _miniRaw.SendChr(0x0F);
+        _graphicMode = true;
+        await _miniRaw.SendChr(0x0E);
     }
 
     /// <summary>

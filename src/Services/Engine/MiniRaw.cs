@@ -1,7 +1,7 @@
 using System.Net.WebSockets;
 using System.Text;
 
-namespace netnitel.Services.Minitel;
+namespace NetNitel.Services.Engine;
 
 
 /// <summary>

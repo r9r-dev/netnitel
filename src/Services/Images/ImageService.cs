@@ -3,7 +3,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Drawing.Processing;
 
-namespace netnitel.Services.Images;
+namespace NetNitel.Services.Images;
 
 public class ImageService
 {
@@ -29,9 +29,12 @@ public class ImageService
     /// </summary>
     /// <param name="imageData"></param>
     /// <returns></returns>
-    public byte[] ResizeImageToMaxDimensions(byte[] imageData)
+    private byte[] ResizeImageToMaxDimensions(byte[] imageData)
     {
         using var image = Image.Load<Rgba32>(imageData);
+        
+        Console.WriteLine($"Resizing image to {IMAGE_WIDTH}x{IMAGE_HEIGHT}");
+        Console.WriteLine($"Source image is {image.Width}x{image.Height}");
         
         // Calculer le ratio d'aspect pour maintenir les proportions
         var ratioX = (double)IMAGE_WIDTH / image.Width;
@@ -74,7 +77,6 @@ public class ImageService
         
         // Créer une nouvelle image avec la taille exacte requise
         using var sourceImage = Image.Load<Rgba32>(resizedImageData);
-        Console.WriteLine($"Dimensions de l'image source: {sourceImage.Width}x{sourceImage.Height}");
         
         // Créer l'image de résultat
         using var resultImage = new Image<Rgba32>(IMAGE_WIDTH, IMAGE_HEIGHT);

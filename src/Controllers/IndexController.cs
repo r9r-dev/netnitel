@@ -1,19 +1,22 @@
 using System.Net.WebSockets;
 using Microsoft.AspNetCore.Mvc;
-using netnitel.Services.Minitel;
+using NetNitel.Services.Applications;
+using NetNitel.Services.Engine;
 
-namespace netnitel.Controllers;
+namespace NetNitel.Controllers;
 
 public class IndexController : ControllerBase
 {
-
+    
     [Route("/index")]
     public async Task Get()
     {
         if (HttpContext.WebSockets.IsWebSocketRequest)
         {
+            var connectionId = Guid.NewGuid();
+            Console.WriteLine($"[{connectionId}] Socket Opened");
             using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-            await HandleIndexWebSocket(webSocket);
+            await HandleIndexWebSocket(webSocket, connectionId);
         }
         else
         {
@@ -21,28 +24,18 @@ public class IndexController : ControllerBase
         }
     }
 
-    private async Task HandleIndexWebSocket(WebSocket webSocket)
+    private async Task HandleIndexWebSocket(WebSocket webSocket, Guid connectionId)
     {
-        var nitel = new NetNitel(webSocket);
+        var nitel = new Minitel(webSocket, connectionId);
         try
         {
-            await nitel.Control.Home();
-            await nitel.Control.ClearScreen();
-            
-            await nitel.DrawImage("data/image.png");
-
-            await nitel.Move(12, 4);
-            await nitel.Control.DoubleSizeText();
-            await nitel.BackColor(MiniColor.Noir);
-            await nitel.ForeColor(MiniColor.Blanc);
-            await nitel.Print("Inutile");
-            
-            
+            var home = new MiniHomeScreen(nitel);
+            await home.StartAsync();
             while (webSocket.State == WebSocketState.Open)
             {
-                _ = await nitel.Input(0, 1, 1, "", "", false);
+                await Task.Delay(50);
             }
-
+            Console.WriteLine($"[{connectionId}] Socket Closed");
         }
         catch (WebSocketException e)
         {
