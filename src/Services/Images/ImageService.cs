@@ -234,4 +234,57 @@ public class ImageService
         // Sauvegarder le résultat
         await File.WriteAllBytesAsync(outputPath, resizedImage);
     }
+    
+    /// <summary>
+    /// Combine plusieurs images en une seule grande image
+    /// </summary>
+    /// <param name="imagePaths">Liste des chemins vers les fichiers PNG à combiner</param>
+    /// <returns>Un tableau d'octets représentant l'image combinée</returns>
+    public async Task<byte[]> CombineImages(List<string> imagePaths)
+    {
+        if (imagePaths == null || !imagePaths.Any())
+            throw new ArgumentException("La liste des images ne peut pas être vide");
+            
+        // Charger toutes les images
+        var images = new List<Image<Rgba32>>();
+        foreach (var path in imagePaths)
+        {
+            var imageBytes = await File.ReadAllBytesAsync(path);
+            images.Add(Image.Load<Rgba32>(imageBytes));
+        }
+        
+        // Organisation horizontale: toutes les images sur une seule ligne
+        var columns = images.Count;
+        var rows = 1;
+        
+        // Trouver la hauteur maximale pour la ligne
+        var maxHeight = images.Max(img => img.Height);
+        
+        // Calculer la largeur totale de l'image de sortie
+        var totalWidth = images.Sum(img => img.Width);
+        var totalHeight = maxHeight;
+        
+        // Créer l'image résultante
+        using var resultImage = new Image<Rgba32>(totalWidth, totalHeight);
+        
+        // Placer chaque image de gauche à droite
+        int currentX = 0;
+        for (int i = 0; i < images.Count; i++)
+        {
+            var image = images[i];
+            resultImage.Mutate(ctx => ctx.DrawImage(image, new Point(currentX, 0), 1f));
+            currentX += image.Width;
+        }
+        
+        // Libérer les ressources des images sources
+        foreach (var img in images)
+        {
+            img.Dispose();
+        }
+        
+        // Convertir en PNG et retourner
+        using var ms = new MemoryStream();
+        await resultImage.SaveAsPngAsync(ms);
+        return ms.ToArray();
+    }
 }
