@@ -1,7 +1,6 @@
 using System.Net.WebSockets;
 using System.Text;
 using System.Drawing;
-using System.Drawing.Imaging;
 using netnitel.Services.Images;
 
 namespace netnitel.Services.Minitel;

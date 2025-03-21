@@ -1,8 +1,5 @@
 using System.Net.WebSockets;
-using System.Text;
-using System.Xml;
 using Microsoft.AspNetCore.Mvc;
-using netnitel.Services;
 using netnitel.Services.Minitel;
 
 namespace netnitel.Controllers;
@@ -43,7 +40,7 @@ public class IndexController : ControllerBase
             
             while (webSocket.State == WebSocketState.Open)
             {
-                var input = await nitel.Input(0, 1, 1, "", "", false);
+                _ = await nitel.Input(0, 1, 1, "", "", false);
             }
 
         }

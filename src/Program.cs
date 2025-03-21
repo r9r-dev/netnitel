@@ -1,7 +1,3 @@
-using System.Net.WebSockets;
-using netnitel.Services;
-using netnitel.Services.Images;
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
