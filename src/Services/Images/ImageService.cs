@@ -74,9 +74,9 @@ public class ImageService
         }
         
         // Traiter chaque bloc de 2x3
-        for (int blockY = 0; blockY < IMAGE_HEIGHT - BLOCK_HEIGHT + 1; blockY += BLOCK_HEIGHT)
+        for (var blockY = 0; blockY < IMAGE_HEIGHT - BLOCK_HEIGHT + 1; blockY += BLOCK_HEIGHT)
         {
-            for (int blockX = 0; blockX < IMAGE_WIDTH - BLOCK_WIDTH + 1; blockX += BLOCK_WIDTH)
+            for (var blockX = 0; blockX < IMAGE_WIDTH - BLOCK_WIDTH + 1; blockX += BLOCK_WIDTH)
             {
                 try
                 {
@@ -106,9 +106,9 @@ public class ImageService
 
         // Collecter toutes les couleurs du bloc
         var colors = new List<Rgba32>();
-        for (int y = blockY; y < blockY + BLOCK_HEIGHT; y++)
+        for (var y = blockY; y < blockY + BLOCK_HEIGHT; y++)
         {
-            for (int x = blockX; x < blockX + BLOCK_WIDTH; x++)
+            for (var x = blockX; x < blockX + BLOCK_WIDTH; x++)
             {
                 try
                 {
@@ -126,9 +126,9 @@ public class ImageService
         var (color1, color2) = FindDominantColors(colors);
 
         // Appliquer les couleurs au bloc
-        for (int y = blockY; y < blockY + BLOCK_HEIGHT; y++)
+        for (var y = blockY; y < blockY + BLOCK_HEIGHT; y++)
         {
-            for (int x = blockX; x < blockX + BLOCK_WIDTH; x++)
+            for (var x = blockX; x < blockX + BLOCK_WIDTH; x++)
             {
                 try
                 {
@@ -202,10 +202,10 @@ public class ImageService
     public void ProcessImageFile(string inputPath, string outputPath)
     {
         // Lire le fichier PNG en bytes
-        byte[] imageBytes = File.ReadAllBytes(inputPath);
+        var imageBytes = File.ReadAllBytes(inputPath);
         
         // Traiter l'image
-        byte[] processedImage = ConvertTo8Colors(imageBytes);
+        var processedImage = ConvertTo8Colors(imageBytes);
         
         // Sauvegarder le résultat
         File.WriteAllBytes(outputPath, processedImage);
@@ -214,10 +214,10 @@ public class ImageService
     public void ResizeImageFile(string inputPath, string outputPath)
     {
         // Lire le fichier PNG en bytes
-        byte[] imageBytes = File.ReadAllBytes(inputPath);
+        var imageBytes = File.ReadAllBytes(inputPath);
         
         // Redimensionner l'image
-        byte[] resizedImage = ResizeImageToMaxDimensions(imageBytes);
+        var resizedImage = ResizeImageToMaxDimensions(imageBytes);
         
         // Sauvegarder le résultat
         File.WriteAllBytes(outputPath, resizedImage);

@@ -29,7 +29,7 @@ public class IndexController : ControllerBase
             await nitel.Control.Home();
             await nitel.Control.ClearScreen();
             
-            await nitel.DrawImage("image.png");
+            await nitel.DrawImage("data/image.png");
 
             await nitel.Move(12, 4);
             await nitel.Control.DoubleSizeText();

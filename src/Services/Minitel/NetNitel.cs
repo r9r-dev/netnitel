@@ -176,14 +176,14 @@ public class NetNitel
         using var image = Image.Load<Rgba32>("temp.png");
         
         // Pour chaque ligne de 24 blocs
-        for (int line = 0; line < 24; line++)
+        for (var line = 0; line < 24; line++)
         {
             // Pour chaque bloc de 2x3 dans la ligne
-            for (int block = 0; block < 40; block++)
+            for (var block = 0; block < 40; block++)
             {
                 // Calculer la position du bloc dans l'image
-                int blockX = block * 2;
-                int blockY = line * 3;
+                var blockX = block * 2;
+                var blockY = line * 3;
 
                 // Définir les couleurs pour ce bloc
                 var (color1, color2) = GetBlockColors(image, blockX, blockY);
@@ -192,9 +192,9 @@ public class NetNitel
 
                 // Lire les 6 pixels du bloc
                 var pixels = new bool[6];
-                for (int y = 0; y < 3; y++)
+                for (var y = 0; y < 3; y++)
                 {
-                    for (int x = 0; x < 2; x++)
+                    for (var x = 0; x < 2; x++)
                     {
                         var color = image[blockX + x, blockY + y];
                         // Si la couleur est plus proche de la première couleur dominante, c'est un pixel positif
@@ -225,9 +225,9 @@ public class NetNitel
     {
         // Collecter toutes les couleurs du bloc
         var colors = new List<Rgba32>();
-        for (int y = blockY; y < blockY + 3; y++)
+        for (var y = blockY; y < blockY + 3; y++)
         {
-            for (int x = blockX; x < blockX + 2; x++)
+            for (var x = blockX; x < blockX + 2; x++)
             {
                 colors.Add(image[x, y]);
             }
@@ -268,7 +268,7 @@ public class NetNitel
     private MiniColor ConvertToMiniColor(Rgba32 color)
     {
         // Trouver l'index de la couleur dans la palette
-        for (int i = 0; i < ImageService.Palette.Length; i++)
+        for (var i = 0; i < ImageService.Palette.Length; i++)
         {
             if (ImageService.Palette[i] == color)
             {
@@ -281,7 +281,7 @@ public class NetNitel
         var minDistance = double.MaxValue;
         var closestIndex = 0;
         
-        for (int i = 0; i < ImageService.Palette.Length; i++)
+        for (var i = 0; i < ImageService.Palette.Length; i++)
         {
             var distance = CalculateColorDistance(color, ImageService.Palette[i]);
             if (distance < minDistance)
