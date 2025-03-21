@@ -12,18 +12,23 @@ public class ImageService
     private const int IMAGE_WIDTH = 80;
     private const int IMAGE_HEIGHT = 72;
 
-    public static readonly Rgba32[] Palette = new[]
-    {
-        new Rgba32(0, 0, 0),       // Noir
-        new Rgba32(255, 0, 0),     // Rouge
-        new Rgba32(0, 255, 0),     // Vert
-        new Rgba32(255, 255, 0),   // Jaune
-        new Rgba32(0, 0, 255),     // Bleu
-        new Rgba32(255, 0, 255),   // Magenta
-        new Rgba32(0, 255, 255),   // Cyan
-        new Rgba32(255, 255, 255)  // Blanc
-    };
+    public static readonly Rgba32[] Palette =
+    [
+        new(0, 0, 0),       // Noir
+        new(255, 0, 0),     // Rouge
+        new(0, 255, 0),     // Vert
+        new(255, 255, 0),   // Jaune
+        new(0, 0, 255),     // Bleu
+        new(255, 0, 255),   // Magenta
+        new(0, 255, 255),   // Cyan
+        new(255, 255, 255)  // Blanc
+    ];
 
+    /// <summary>
+    /// Redimensionne une image en conservant les proportions et en la centrant vers le format Minitel (80x72)
+    /// </summary>
+    /// <param name="imageData"></param>
+    /// <returns></returns>
     public byte[] ResizeImageToMaxDimensions(byte[] imageData)
     {
         using var image = Image.Load<Rgba32>(imageData);
@@ -54,8 +59,15 @@ public class ImageService
         resizedImage.SaveAsPng(ms);
         return ms.ToArray();
     }
-
-    public byte[] ConvertTo8Colors(byte[] imageData)
+    
+    /// <summary>
+    /// Convertis une image en 8 couleurs en utilisant la palette Minitel
+    /// L'image est redimensionnée en 80x72
+    /// </summary>
+    /// <param name="imageData"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public async Task<byte[]> ConvertTo8Colors(byte[] imageData)
     {
         // D'abord redimensionner l'image
         var resizedImageData = ResizeImageToMaxDimensions(imageData);
@@ -92,7 +104,7 @@ public class ImageService
         
         // Sauvegarder en PNG
         using var outputMs = new MemoryStream();
-        resultImage.SaveAsPng(outputMs);
+        await resultImage.SaveAsPngAsync(outputMs);
         return outputMs.ToArray();
     }
 
@@ -133,7 +145,7 @@ public class ImageService
                 try
                 {
                     var originalColor = source[x, y];
-                    var newColor = FindClosestColor(originalColor, new[] { color1, color2 });
+                    var newColor = FindClosestColor(originalColor, [color1, color2]);
                     target[x, y] = newColor;
                 }
                 catch (Exception ex)
@@ -162,7 +174,7 @@ public class ImageService
 
     private Rgba32 CalculateAverageColor(List<Rgba32> colors)
     {
-        if (!colors.Any()) return new Rgba32(0, 0, 0);
+        if (colors.Count == 0) return new Rgba32(0, 0, 0);
 
         var r = (byte)colors.Average(c => c.R);
         var g = (byte)colors.Average(c => c.G);
@@ -179,11 +191,9 @@ public class ImageService
         foreach (var allowedColor in allowedColors)
         {
             var distance = CalculateColorDistance(color, allowedColor);
-            if (distance < minDistance)
-            {
-                minDistance = distance;
-                closestColor = allowedColor;
-            }
+            if (!(distance < minDistance)) continue;
+            minDistance = distance;
+            closestColor = allowedColor;
         }
 
         return closestColor;
@@ -199,27 +209,27 @@ public class ImageService
         return Math.Sqrt(rDiff * rDiff + gDiff * gDiff + bDiff * bDiff);
     }
 
-    public void ProcessImageFile(string inputPath, string outputPath)
+    public async Task ProcessImageFile(string inputPath, string outputPath)
     {
         // Lire le fichier PNG en bytes
-        var imageBytes = File.ReadAllBytes(inputPath);
+        var imageBytes = await File.ReadAllBytesAsync(inputPath);
         
         // Traiter l'image
-        var processedImage = ConvertTo8Colors(imageBytes);
+        var processedImage = await ConvertTo8Colors(imageBytes);
         
         // Sauvegarder le résultat
-        File.WriteAllBytes(outputPath, processedImage);
+        await File.WriteAllBytesAsync(outputPath, processedImage);
     }
 
-    public void ResizeImageFile(string inputPath, string outputPath)
+    public async Task ResizeImageFile(string inputPath, string outputPath)
     {
         // Lire le fichier PNG en bytes
-        var imageBytes = File.ReadAllBytes(inputPath);
+        var imageBytes = await File.ReadAllBytesAsync(inputPath);
         
         // Redimensionner l'image
         var resizedImage = ResizeImageToMaxDimensions(imageBytes);
         
         // Sauvegarder le résultat
-        File.WriteAllBytes(outputPath, resizedImage);
+        await File.WriteAllBytesAsync(outputPath, resizedImage);
     }
 }
