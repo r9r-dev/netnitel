@@ -14,7 +14,8 @@ public class MiniHomeScreen(Minitel tel)
         await tel.Control.Home();
         await tel.Control.ClearScreen();
         
-        await tel.DrawImage("data/font.png");
+        await tel.DrawImage("data/alita.png");
+        await tel.DrawText("Alita", 20, 23,foreColor: MiniColor.Jaune, backColor: MiniColor.Bleu);
     }
     
     public async Task DrawHomeScreen()

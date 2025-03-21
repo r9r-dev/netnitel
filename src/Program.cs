@@ -1,3 +1,5 @@
+using NetNitel.Services.Images;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -13,7 +15,6 @@ var webSocketOptions = new WebSocketOptions
 app.UseWebSockets(webSocketOptions);
 
 app.MapControllers();
-
 
 app.Run();
 
