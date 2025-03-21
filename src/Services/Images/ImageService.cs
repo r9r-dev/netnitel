@@ -1,5 +1,7 @@
-using System.Drawing;
-using System.Drawing.Imaging;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Drawing.Processing;
 
 namespace netnitel.Services.Images;
 
@@ -10,49 +12,46 @@ public class ImageService
     private const int IMAGE_WIDTH = 80;
     private const int IMAGE_HEIGHT = 72;
 
-    public static readonly Color[] Palette = new[]
+    public static readonly Rgba32[] Palette = new[]
     {
-        Color.FromArgb(0, 0, 0),    // Noir
-        Color.FromArgb(255, 0, 0),      // Rouge
-        Color.FromArgb(0, 255, 0),    // Vert
-        Color.FromArgb(255, 255, 0),   // Jaune
-        Color.FromArgb(0, 0, 255),     // Bleu
-        Color.FromArgb(255, 0, 255),  // Magenta
-        Color.FromArgb(0, 255, 255),     // Cyan
-        Color.FromArgb(255, 255, 255)  // Blanc
+        new Rgba32(0, 0, 0),       // Noir
+        new Rgba32(255, 0, 0),     // Rouge
+        new Rgba32(0, 255, 0),     // Vert
+        new Rgba32(255, 255, 0),   // Jaune
+        new Rgba32(0, 0, 255),     // Bleu
+        new Rgba32(255, 0, 255),   // Magenta
+        new Rgba32(0, 255, 255),   // Cyan
+        new Rgba32(255, 255, 255)  // Blanc
     };
 
     public byte[] ResizeImageToMaxDimensions(byte[] imageData)
     {
-        using var originalImage = Image.FromStream(new MemoryStream(imageData));
-        
-        // Créer une nouvelle image avec les dimensions exactes requises
-        using var resizedImage = new Bitmap(IMAGE_WIDTH, IMAGE_HEIGHT);
-        using var graphics = Graphics.FromImage(resizedImage);
-        
-        // Configurer la qualité du redimensionnement
-        graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-        graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-        graphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+        using var image = Image.Load<Rgba32>(imageData);
         
         // Calculer le ratio d'aspect pour maintenir les proportions
-        var ratioX = (double)IMAGE_WIDTH / originalImage.Width;
-        var ratioY = (double)IMAGE_HEIGHT / originalImage.Height;
+        var ratioX = (double)IMAGE_WIDTH / image.Width;
+        var ratioY = (double)IMAGE_HEIGHT / image.Height;
         var ratio = Math.Min(ratioX, ratioY);
         
-        var newWidth = (int)(originalImage.Width * ratio);
-        var newHeight = (int)(originalImage.Height * ratio);
+        var newWidth = (int)(image.Width * ratio);
+        var newHeight = (int)(image.Height * ratio);
         
         // Calculer la position pour centrer l'image
         var x = (IMAGE_WIDTH - newWidth) / 2;
         var y = (IMAGE_HEIGHT - newHeight) / 2;
         
+        // Créer une nouvelle image avec les dimensions exactes requises
+        using var resizedImage = new Image<Rgba32>(IMAGE_WIDTH, IMAGE_HEIGHT);
+        
+        // Redimensionner l'image source
+        image.Mutate(ctx => ctx.Resize(newWidth, newHeight));
+        
         // Dessiner l'image redimensionnée au centre
-        graphics.DrawImage(originalImage, x, y, newWidth, newHeight);
+        resizedImage.Mutate(ctx => ctx.DrawImage(image, new Point(x, y), 1f));
         
         // Convertir en PNG
         using var ms = new MemoryStream();
-        resizedImage.Save(ms, ImageFormat.Png);
+        resizedImage.SaveAsPng(ms);
         return ms.ToArray();
     }
 
@@ -62,25 +61,16 @@ public class ImageService
         var resizedImageData = ResizeImageToMaxDimensions(imageData);
         
         // Créer une nouvelle image avec la taille exacte requise
-        using var sourceBitmap = new Bitmap(IMAGE_WIDTH, IMAGE_HEIGHT);
-        using (var ms = new MemoryStream(resizedImageData))
-        {
-            using var tempImage = new Bitmap(ms);
-            Console.WriteLine($"Dimensions de l'image temporaire: {tempImage.Width}x{tempImage.Height}");
-            
-            using var graphics = Graphics.FromImage(sourceBitmap);
-            graphics.DrawImage(tempImage, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
-        }
-        
-        Console.WriteLine($"Dimensions de l'image source: {sourceBitmap.Width}x{sourceBitmap.Height}");
+        using var sourceImage = Image.Load<Rgba32>(resizedImageData);
+        Console.WriteLine($"Dimensions de l'image source: {sourceImage.Width}x{sourceImage.Height}");
         
         // Créer l'image de résultat
-        using var resultBitmap = new Bitmap(IMAGE_WIDTH, IMAGE_HEIGHT);
+        using var resultImage = new Image<Rgba32>(IMAGE_WIDTH, IMAGE_HEIGHT);
         
         // Vérifier que les dimensions sont correctes
-        if (sourceBitmap.Width != IMAGE_WIDTH || sourceBitmap.Height != IMAGE_HEIGHT)
+        if (sourceImage.Width != IMAGE_WIDTH || sourceImage.Height != IMAGE_HEIGHT)
         {
-            throw new InvalidOperationException($"L'image source n'a pas les bonnes dimensions. Attendu: {IMAGE_WIDTH}x{IMAGE_HEIGHT}, Obtenu: {sourceBitmap.Width}x{sourceBitmap.Height}");
+            throw new InvalidOperationException($"L'image source n'a pas les bonnes dimensions. Attendu: {IMAGE_WIDTH}x{IMAGE_HEIGHT}, Obtenu: {sourceImage.Width}x{sourceImage.Height}");
         }
         
         // Traiter chaque bloc de 2x3
@@ -90,7 +80,7 @@ public class ImageService
             {
                 try
                 {
-                    ProcessBlock(sourceBitmap, resultBitmap, blockX, blockY);
+                    ProcessBlock(sourceImage, resultImage, blockX, blockY);
                 }
                 catch (Exception ex)
                 {
@@ -102,11 +92,11 @@ public class ImageService
         
         // Sauvegarder en PNG
         using var outputMs = new MemoryStream();
-        resultBitmap.Save(outputMs, ImageFormat.Png);
+        resultImage.SaveAsPng(outputMs);
         return outputMs.ToArray();
     }
 
-    private void ProcessBlock(Bitmap source, Bitmap target, int blockX, int blockY)
+    private void ProcessBlock(Image<Rgba32> source, Image<Rgba32> target, int blockX, int blockY)
     {
         // Vérifier les limites du bloc
         if (blockX + BLOCK_WIDTH > source.Width || blockY + BLOCK_HEIGHT > source.Height)
@@ -115,14 +105,14 @@ public class ImageService
         }
 
         // Collecter toutes les couleurs du bloc
-        var colors = new List<Color>();
+        var colors = new List<Rgba32>();
         for (int y = blockY; y < blockY + BLOCK_HEIGHT; y++)
         {
             for (int x = blockX; x < blockX + BLOCK_WIDTH; x++)
             {
                 try
                 {
-                    colors.Add(source.GetPixel(x, y));
+                    colors.Add(source[x, y]);
                 }
                 catch (Exception ex)
                 {
@@ -142,9 +132,9 @@ public class ImageService
             {
                 try
                 {
-                    var originalColor = source.GetPixel(x, y);
+                    var originalColor = source[x, y];
                     var newColor = FindClosestColor(originalColor, new[] { color1, color2 });
-                    target.SetPixel(x, y, newColor);
+                    target[x, y] = newColor;
                 }
                 catch (Exception ex)
                 {
@@ -155,7 +145,7 @@ public class ImageService
         }
     }
 
-    private (Color color1, Color color2) FindDominantColors(List<Color> colors)
+    private (Rgba32 color1, Rgba32 color2) FindDominantColors(List<Rgba32> colors)
     {
         // Calculer la moyenne des couleurs
         var avgColor = CalculateAverageColor(colors);
@@ -170,18 +160,18 @@ public class ImageService
         return (distances[0].color, distances[1].color);
     }
 
-    private Color CalculateAverageColor(List<Color> colors)
+    private Rgba32 CalculateAverageColor(List<Rgba32> colors)
     {
-        if (!colors.Any()) return Color.Black;
+        if (!colors.Any()) return new Rgba32(0, 0, 0);
 
-        var r = colors.Average(c => c.R);
-        var g = colors.Average(c => c.G);
-        var b = colors.Average(c => c.B);
+        var r = (byte)colors.Average(c => c.R);
+        var g = (byte)colors.Average(c => c.G);
+        var b = (byte)colors.Average(c => c.B);
 
-        return Color.FromArgb((int)r, (int)g, (int)b);
+        return new Rgba32(r, g, b);
     }
 
-    private Color FindClosestColor(Color color, Color[] allowedColors)
+    private Rgba32 FindClosestColor(Rgba32 color, Rgba32[] allowedColors)
     {
         var minDistance = double.MaxValue;
         var closestColor = allowedColors[0];
@@ -199,7 +189,7 @@ public class ImageService
         return closestColor;
     }
 
-    private static double CalculateColorDistance(Color color1, Color color2)
+    private static double CalculateColorDistance(Rgba32 color1, Rgba32 color2)
     {
         // Utilisation de la distance euclidienne dans l'espace RGB
         var rDiff = color1.R - color2.R;

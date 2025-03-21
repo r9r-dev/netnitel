@@ -1,6 +1,8 @@
 using System.Net.WebSockets;
 using System.Text;
-using System.Drawing;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 using netnitel.Services.Images;
 
 namespace netnitel.Services.Minitel;
@@ -171,7 +173,7 @@ public class NetNitel
         _imageService.ProcessImageFile(imagePath, "temp.png");
         
         // Charger l'image traitée
-        using var bitmap = new Bitmap("temp.png");
+        using var image = Image.Load<Rgba32>("temp.png");
         
         // Pour chaque ligne de 24 blocs
         for (int line = 0; line < 24; line++)
@@ -184,7 +186,7 @@ public class NetNitel
                 int blockY = line * 3;
 
                 // Définir les couleurs pour ce bloc
-                var (color1, color2) = GetBlockColors(bitmap, blockX, blockY);
+                var (color1, color2) = GetBlockColors(image, blockX, blockY);
                 await Control.ForeColor(ConvertToMiniColor(color1));
                 await Control.BackColor(ConvertToMiniColor(color2));
 
@@ -194,7 +196,7 @@ public class NetNitel
                 {
                     for (int x = 0; x < 2; x++)
                     {
-                        var color = bitmap.GetPixel(blockX + x, blockY + y);
+                        var color = image[blockX + x, blockY + y];
                         // Si la couleur est plus proche de la première couleur dominante, c'est un pixel positif
                         pixels[y * 2 + x] = IsPositivePixel(color, color1, color2);
                     }
@@ -209,7 +211,7 @@ public class NetNitel
         }
     }
 
-    private bool IsPositivePixel(Color color, Color color1, Color color2)
+    private bool IsPositivePixel(Rgba32 color, Rgba32 color1, Rgba32 color2)
     {
         // Calculer la distance entre la couleur du pixel et les deux couleurs dominantes
         var distance1 = CalculateColorDistance(color, color1);
@@ -219,15 +221,15 @@ public class NetNitel
         return distance1 <= distance2;
     }
 
-    private (Color color1, Color color2) GetBlockColors(Bitmap bitmap, int blockX, int blockY)
+    private (Rgba32 color1, Rgba32 color2) GetBlockColors(Image<Rgba32> image, int blockX, int blockY)
     {
         // Collecter toutes les couleurs du bloc
-        var colors = new List<Color>();
+        var colors = new List<Rgba32>();
         for (int y = blockY; y < blockY + 3; y++)
         {
             for (int x = blockX; x < blockX + 2; x++)
             {
-                colors.Add(bitmap.GetPixel(x, y));
+                colors.Add(image[x, y]);
             }
         }
 
@@ -242,19 +244,20 @@ public class NetNitel
         return (distances[0].color, distances[1].color);
     }
 
-    private Color CalculateAverageColor(List<Color> colors)
+    private Rgba32 CalculateAverageColor(List<Rgba32> colors)
     {
-        if (!colors.Any()) return Color.Black;
+        if (!colors.Any()) return new Rgba32(0, 0, 0);
 
-        var r = colors.Average(c => c.R);
-        var g = colors.Average(c => c.G);
-        var b = colors.Average(c => c.B);
+        var r = (byte)colors.Average(c => c.R);
+        var g = (byte)colors.Average(c => c.G);
+        var b = (byte)colors.Average(c => c.B);
 
-        return Color.FromArgb((int)r, (int)g, (int)b);
+        return new Rgba32(r, g, b);
     }
 
-    private double CalculateColorDistance(Color color1, Color color2)
+    private double CalculateColorDistance(Rgba32 color1, Rgba32 color2)
     {
+        // Utilisation de la distance euclidienne dans l'espace RGB
         var rDiff = color1.R - color2.R;
         var gDiff = color1.G - color2.G;
         var bDiff = color1.B - color2.B;
@@ -262,7 +265,7 @@ public class NetNitel
         return Math.Sqrt(rDiff * rDiff + gDiff * gDiff + bDiff * bDiff);
     }
 
-    private MiniColor ConvertToMiniColor(Color color)
+    private MiniColor ConvertToMiniColor(Rgba32 color)
     {
         // Trouver l'index de la couleur dans la palette
         for (int i = 0; i < ImageService.Palette.Length; i++)
