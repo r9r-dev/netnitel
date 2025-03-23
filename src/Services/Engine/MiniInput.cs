@@ -1,3 +1,5 @@
+using NetNitel.Services.Engine.Enums;
+
 namespace NetNitel.Services.Engine;
 
 public class MiniInput

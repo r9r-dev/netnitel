@@ -1,4 +1,5 @@
 using System.Net.WebSockets;
+using NetNitel.Services.Engine.Enums;
 
 namespace NetNitel.Services.Engine;
 
@@ -22,7 +23,7 @@ public class MiniControl
     /// <param name="text"></param>
     public async Task Write(string text)
     {
-        if (_graphicMode) await TextMode();
+        await AlphanumericMode();
         await _miniRaw.Send(text);
     }
 
@@ -99,7 +100,7 @@ public class MiniControl
         await _miniRaw.SendEsc(0x4E);
     }
 
-    public async Task WriteGraphic(string character)
+    public async Task<MiniControl> WriteGraphic(string character)
     {
         if (character.Length != 6) throw new ArgumentException("Le caractère doit être de 6 bits");
         if (!_graphicMode) await GraphicMode();
@@ -108,6 +109,7 @@ public class MiniControl
         // il faut inverser le sens du texte et le convertir en binaire
         var text = character.Reverse().Aggregate(0, (current, c) => current * 2 + (c == '1' ? 1 : 0));
         await _miniRaw.Send(32 + text);
+        return this;
     }
     
     /// <summary>
@@ -149,7 +151,7 @@ public class MiniControl
     /// <summary>
     /// Passage dans le jeu normal (G0)
     /// </summary>
-    private async Task TextMode()
+    private async Task AlphanumericMode()
     {
         _graphicMode = false;
         await _miniRaw.SendChr(0x0F);
@@ -231,6 +233,33 @@ public class MiniControl
         await _miniRaw.SendChr(0x1E);
     }
 
+    public async Task CreateDRCSAlphanumeric(char character)
+    {
+        if (character < 33 || character > 127) 
+            throw new ArgumentOutOfRangeException(nameof(character), "Le caractère doit être compris entre ASCII 33 (espace) et ASCII 127 (DEL)");
+        
+        // En-tete de téléchargement jeu G'0
+        await _miniRaw.SendChr(0x1F);
+        await _miniRaw.SendChr(0x23);
+        await _miniRaw.SendChr(0x20);
+        await _miniRaw.SendChr(0x20);
+        await _miniRaw.SendChr(0x20);
+        await _miniRaw.SendChr(0x42);
+        await _miniRaw.SendChr(0x49);
+        
+        // Caractère à télécharger
+        await _miniRaw.SendChr(0x1F);
+        await _miniRaw.SendChr(0x23);
+        await _miniRaw.SendChr(character);
+        // Caractère
+        await _miniRaw.SendChr(0x30);
+        
+        await _miniRaw.SendChr(0x30);
+        
+        // Fin de téléchargement (déplacement curseur)
+        await Move(1);
+    }
+
     public async Task Move(int ligne, int colonne = 1)
     {
         _graphicMode = false;
@@ -245,5 +274,22 @@ public class MiniControl
             await _miniRaw.SendChr(64 + colonne);
         }
         
+    }
+
+    /// <summary>
+    /// Ecrire avec ou sans soulignement
+    /// En mode graphique, avec ou sans mode disjoint
+    /// </summary>
+    /// <param name="active"></param>
+    /// <exception cref="NotImplementedException"></exception>
+    public async Task Underline(bool active)
+    {
+        if (active) await _miniRaw.SendEsc(0x5A);
+        else await _miniRaw.SendEsc(0x59);
+    }
+
+    public async Task Raw(int chr)
+    {
+        await _miniRaw.SendChr(chr);
     }
 }
