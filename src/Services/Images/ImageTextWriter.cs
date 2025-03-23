@@ -1,12 +1,24 @@
+using NetNitel.Services.Engine;
+using NetNitel.Services.Engine.Enums;
+
 namespace NetNitel.Services.Images;
 
 public class ImageTextWriter
 {
-   private const string BASE_PATH = "data/letters/";
 
-
-   public List<string> GetImageLetters(string text)
+   public List<string> GetImageLetters(string text, MiniFont font = MiniFont.TheBigOne)
    {
+      string basePath = string.Empty;
+      switch (font)
+      {
+         case MiniFont.TheBigOne:
+            basePath = "data/letters/";
+            break;
+         case MiniFont.TheSmallOne:
+            basePath = "data/letters_small/";
+            break;
+      }
+      
       var result = new List<string>();
       
       if (string.IsNullOrEmpty(text))
@@ -21,139 +33,142 @@ public class ImageTextWriter
                if (char.IsUpper(c))
                {
                   // Format pour les majuscules: u[lettre].png
-                  result.Add($"{BASE_PATH}u{c.ToString().ToLower()}.png");
+                  result.Add($"{basePath}u{c.ToString().ToLower()}.png");
                   continue;
                }
 
                // Format pour les minuscules: l[lettre].png
-               result.Add($"{BASE_PATH}l{c}.png");
+               result.Add($"{basePath}l{c}.png");
                continue;
             }
 
             if (char.IsWhiteSpace(c))
             {
-               result.Add($"{BASE_PATH}space.png");
+               result.Add($"{basePath}space.png");
                continue;
             }
 
             if (char.IsNumber(c))
             {
-               result.Add($"{BASE_PATH}{c}.png");
+               result.Add($"{basePath}{c}.png");
                continue;
             }
 
             switch (c)
             {
                case '_':
-                  result.Add($"{BASE_PATH}underscore.png");
+                  result.Add($"{basePath}underscore.png");
                   break;
                case '!':
-                  result.Add($"{BASE_PATH}exclamation.png");
+                  result.Add($"{basePath}exclamation.png");
                   break;
                case '"':
-                  result.Add($"{BASE_PATH}doublequote.png");
+                  result.Add($"{basePath}doublequote.png");
                   break;
                case '#':
-                  result.Add($"{BASE_PATH}hash.png");
+                  result.Add($"{basePath}hash.png");
                   break;
                case '$':
-                  result.Add($"{BASE_PATH}dollar.png");
+                  result.Add($"{basePath}dollar.png");
                   break;
                case '%':
-                  result.Add($"{BASE_PATH}percent.png");
+                  result.Add($"{basePath}percent.png");
                   break;
                case '&':
-                  result.Add($"{BASE_PATH}ampersand.png");
+                  result.Add($"{basePath}ampersand.png");
                   break;
                case '\'':
-                  result.Add($"{BASE_PATH}apostrophe.png");
+                  result.Add($"{basePath}apostrophe.png");
                   break;
                case '(':
-                  result.Add($"{BASE_PATH}leftparen.png");
+                  result.Add($"{basePath}leftparen.png");
                   break;
                case ')':
-                  result.Add($"{BASE_PATH}rightparen.png");
+                  result.Add($"{basePath}rightparen.png");
                   break;
                case '×':
-                  result.Add($"{BASE_PATH}times.png");
+                  result.Add($"{basePath}times.png");
                   break;
                case '÷':
-                  result.Add($"{BASE_PATH}divide.png");
+                  result.Add($"{basePath}divide.png");
                   break;
                case '+':
-                  result.Add($"{BASE_PATH}plus.png");
+                  result.Add($"{basePath}plus.png");
                   break;
                case ',':
-                  result.Add($"{BASE_PATH}comma.png");
+                  result.Add($"{basePath}comma.png");
                   break;
                case '-':
-                  result.Add($"{BASE_PATH}minus.png");
+                  result.Add($"{basePath}minus.png");
                   break;
                case '.':
-                  result.Add($"{BASE_PATH}dot.png");
+                  result.Add($"{basePath}dot.png");
                   break;
                case '/':
-                  result.Add($"{BASE_PATH}slash.png");
+                  result.Add($"{basePath}slash.png");
                   break;
                case ':':
-                  result.Add($"{BASE_PATH}colon.png");
+                  result.Add($"{basePath}colon.png");
                   break;
                case ';':
-                  result.Add($"{BASE_PATH}semicolon.png");
+                  result.Add($"{basePath}semicolon.png");
                   break;
                case '<':
-                  result.Add($"{BASE_PATH}leftangle.png");
+                  result.Add($"{basePath}leftangle.png");
                   break;
                case '=':
-                  result.Add($"{BASE_PATH}equal.png");
+                  result.Add($"{basePath}equal.png");
                   break;
                case '>':
-                  result.Add($"{BASE_PATH}rightangle.png");
+                  result.Add($"{basePath}rightangle.png");
                   break;
                case '?':
-                  result.Add($"{BASE_PATH}question.png");
+                  result.Add($"{basePath}question.png");
                   break;
                case '[':
-                  result.Add($"{BASE_PATH}leftbracket.png");
+                  result.Add($"{basePath}leftbracket.png");
                   break;
                case ']':
-                  result.Add($"{BASE_PATH}rightbracket.png");
+                  result.Add($"{basePath}rightbracket.png");
                   break;
                case '\\':
-                  result.Add($"{BASE_PATH}backslash.png");
+                  result.Add($"{basePath}backslash.png");
                   break;
                case '^':
-                  result.Add($"{BASE_PATH}caret.png");
+                  result.Add($"{basePath}caret.png");
                   break;
                case '`':
-                  result.Add($"{BASE_PATH}grave.png");
+                  result.Add($"{basePath}grave.png");
                   break;
                case '{':
-                  result.Add($"{BASE_PATH}leftbrace.png");
+                  result.Add($"{basePath}leftbrace.png");
                   break;
                case '}':
-                  result.Add($"{BASE_PATH}rightbrace.png");
+                  result.Add($"{basePath}rightbrace.png");
                   break;
                case '|':
-                  result.Add($"{BASE_PATH}bar.png");
+                  result.Add($"{basePath}bar.png");
                   break;
                case '~':
-                  result.Add($"{BASE_PATH}tilde.png");
+                  result.Add($"{basePath}tilde.png");
                   break;
                case '@':
-                  result.Add($"{BASE_PATH}at.png");
+                  result.Add($"{basePath}at.png");
                   break;
                case '\u25ae':
-                  result.Add($"{BASE_PATH}blackrectangle.png");
+                  result.Add($"{basePath}blackrectangle.png");
                   break;
                case '€':
-                  result.Add($"{BASE_PATH}euro.png");
+                  result.Add($"{basePath}euro.png");
                   break;
                case 'µ':
-                  result.Add($"{BASE_PATH}micro.png");
+                  result.Add($"{basePath}micro.png");
+                  break;
+               case '·':
+                  result.Add($"{basePath}middlepoint.png");
                   break;
                default:
-                  result.Add($"{BASE_PATH}unknown.png");
+                  result.Add($"{basePath}unknown.png");
                   break;
 
             }
@@ -161,6 +176,15 @@ public class ImageTextWriter
          catch (Exception e)
          {
             Console.WriteLine(e);
+         }
+      }
+      
+      // check if file exist for each result
+      for (int i = 0; i < result.Count; i++)
+      {
+         if (!File.Exists(result[i]))
+         {
+            result[i] = $"{basePath}blackrectangle.png";
          }
       }
       
