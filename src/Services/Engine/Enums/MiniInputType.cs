@@ -1,4 +1,4 @@
-namespace NetNitel.Services.Engine;
+namespace NetNitel.Services.Engine.Enums;
 
 public enum MiniInputType
 {
