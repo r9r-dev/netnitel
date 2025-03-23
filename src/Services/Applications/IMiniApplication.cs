@@ -1,6 +1,8 @@
+using NetNitel.Services.Engine;
+
 namespace NetNitel.Services.Applications;
 
-public interface IMiniApplication
+public abstract class MiniApplication(Minitel tel)
 {
-    public Task StartAsync();
+    public abstract Task StartAsync();
 }
